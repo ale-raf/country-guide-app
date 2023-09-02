@@ -1,10 +1,26 @@
 const country = document.querySelector(".country-main");
 const countryInfos = document.querySelector(".country-infos");
 const searchInput = document.getElementById("search");
+const select = document.getElementById("countries");
 const form = document.querySelector("form");
 
+function getAllCountries() {
+  fetch("https://restcountries.com/v3.1/all")
+    .then((res) => res.json())
+    .then((countries) => {
+      countries.forEach((country) => {
+        const countryOption = document.createElement("option");
+        countryOption.value = country.name.common;
+        countryOption.innerHTML = country.name.common;
+        select.appendChild(countryOption);
+      });
+    });
+}
+
+getAllCountries();
+
 function showCountry(data) {
-  if (searchInput.value) {
+  if (select.value !== "") {
     country.innerHTML = `<p class="country-flag">${data[0].flag}</p><h3>${data[0].name.common}</h3>`;
     countryInfos.innerHTML = `<li><span>Capital: </span>${
       data[0].capital[0]
@@ -18,18 +34,17 @@ function showCountry(data) {
       .toString()
       .split(",")
       .join(", ")}</li>`;
-    searchInput.value = "";
   } else {
-    country.innerHTML = `<p class="alert">Please enter a valid country name.</p>`;
+    country.innerHTML = `<p class="alert">You need to select a country.</p>`;
     countryInfos.innerHTML = "";
   }
 }
 
-form.addEventListener("submit", getMyCountry);
+select.addEventListener("change", getMyCountry);
 
 function getMyCountry(e) {
   e.preventDefault();
-  fetch(`https://restcountries.com/v3.1/name/${searchInput.value}`)
+  fetch(`https://restcountries.com/v3.1/name/${select.value}`)
     .then((res) => res.json())
     .then((data) => {
       showCountry(data);
